@@ -12,7 +12,8 @@ RUN pip install requests pymongo
 
 RUN mkdir /score-updater
 
-COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 COPY ./update-scores.py /score-updater/update-scores.py
+COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
 ENTRYPOINT ["./docker-entrypoint.sh"]

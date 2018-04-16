@@ -25,46 +25,19 @@ for match in matches.find({"match_status": {"$ne": "Finished"}}):
       request = requests.get(request_string)
       summary = request.json()                                                      
       summary['unique_id'] = match['unique_id']
-      match_data.update_one(                                                        {               
-          'unique_id': match['unique_id']                                           },                                                                          {                                                                   
-          '$set': summary                                                   
-        },
-        upsert = True                                                             )
-      matches.update_one(
-        { 
-          'unique_id': match['unique_id']
-        },
-        {
-          '$set':
-          {    
-            'match_status': 'Started'
-          }
-        }
-      )
+
+      match_data.update_one({'unique_id': match['unique_id']},{'$set': summary},upsert = True)
+      matches.update_one({'unique_id': match['unique_id']},{'$set':{'match_status': 'Started'}})
+
   elif match['match_status'] == "Started":
     request_string = 'http://cricapi.com/api/fantasySummary?apikey='+ api_key + '&unique_id=' + match['unique_id']
     request = requests.get(request_string)
     summary = request.json()                                                        
     summary['unique_id'] = match['unique_id']                                       
-    match_data.update_one(                                                        {                                                                    
-        'unique_id': match['unique_id']                                     
-      },                                                                   
-      {                                                                    
-        '$set': summary                                                     
-      },                                                                    
-      upsert = True                                                         
-    )
+
+    match_data.update_one({'unique_id': match['unique_id']},{'$set': summary},upsert = True)
+
     if summary['data']['man-of-the-match'] == "":
       print("match in progress")
     else:
-      matches.update_one(                                                   
-        {                                                                   
-          'unique_id': match['unique_id']                                   
-        },                                                                  
-        {                                                                   
-          '$set':                                                           
-          {                                                                 
-            'match_status': 'Finished'                                      
-          }                                                                 
-        }                                                                   
-      )
+      matches.update_one({'unique_id': match['unique_id']},{'$set':{'match_status': 'Finished'}})
